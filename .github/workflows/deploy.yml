@@ -48,17 +48,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          # Ensure there's a trailing newline which is required by some SSH clients
-          sed -i '$a\' ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add VPS to known hosts
+        run: ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
 
       - name: Copy orchestration files to VPS
         run: |
-          # Use -O for scp if available to use legacy protocol if needed, but here we just ensure the destination exists
           ssh ${{ secrets.SSH_USER }}@${{ secrets.VPS_IP }} "mkdir -p /srv/domfeliu/"
           scp -r docker-compose.yml infrastructure/ ${{ secrets.SSH_USER }}@${{ secrets.VPS_IP }}:/srv/domfeliu/
 
