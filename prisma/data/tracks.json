@@ -1,0 +1,24 @@
+[
+  {
+    "title": "Midnight Groove",
+    "artist": "Dom Feliu",
+    "audioUrl": "/uploads/sample.mp3",
+    "spotifyUrl": "https://open.spotify.com",
+    "soundcloudUrl": "https://soundcloud.com",
+    "order": 0
+  },
+  {
+    "title": "Neon Lights",
+    "artist": "Dom Feliu",
+    "audioUrl": "/uploads/sample.mp3",
+    "spotifyUrl": "https://open.spotify.com",
+    "soundcloudUrl": "https://soundcloud.com",
+    "order": 1
+  },
+  {
+    "title": "Urban Jungle",
+    "artist": "Dom Feliu",
+    "audioUrl": "/uploads/sample.mp3",
+    "order": 2
+  }
+]

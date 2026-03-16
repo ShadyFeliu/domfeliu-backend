@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AdminUser {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  password     String
+  bio          String?
+  profileImage String?  @map("profile_image")
+  presskitUrl  String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("admin_users")
+}
+
+model Track {
+  id            String   @id @default(uuid())
+  title         String
+  artist        String   @default("Dom Feliu")
+  audioUrl      String   @map("audio_url")
+  coverUrl      String?  @map("cover_url")
+  spotifyUrl    String?  @map("spotify_url")
+  soundcloudUrl String?  @map("soundcloud_url")
+  order         Int      @default(0)
+  isPublished   Boolean  @default(true) @map("is_published")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("tracks")
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  date        DateTime
+  venue       String
+  city        String
+  country     String
+  ticketUrl   String?  @map("ticket_url")
+  imageUrl    String?  @map("image_url")
+  isPublished Boolean  @default(true) @map("is_published")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("events")
+}
+
+model GalleryItem {
+  id        String   @id @default(uuid())
+  type      String   // "image" | "video"
+  url       String
+  caption   String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("gallery_items")
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("contact_messages")
+}
+
+model Venue {
+  id        String   @id @default(uuid())
+  name      String
+  city      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("venues")
+}
+model AuditLog {
+  id         String   @id @default(uuid())
+  action     String   // "CREATE", "UPDATE", "DELETE", "LOGIN", etc.
+  entityType String   @map("entity_type") // "TRACK", "EVENT", "GALLERY", "ADMIN", etc.
+  entityId   String?  @map("entity_id")
+  adminEmail String   @map("admin_email")
+  details    Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}

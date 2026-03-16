@@ -1,0 +1,16 @@
+[
+  {
+    "title": "Club Session",
+    "venue": "Razzmatazz",
+    "city": "Barcelona",
+    "country": "España",
+    "ticketUrl": "https://tickets.example.com"
+  },
+  {
+    "title": "Festival Summer",
+    "venue": "Pacha",
+    "city": "Ibiza",
+    "country": "España",
+    "ticketUrl": "https://tickets.example.com"
+  }
+]

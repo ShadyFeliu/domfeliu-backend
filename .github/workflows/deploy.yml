@@ -1,0 +1,74 @@
+name: Build, Push and Deploy Backend
+
+on:
+  push:
+    branches: [ main, master ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code (for docker-compose and nginx configs)
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+
+      - name: Copy orchestration files to VPS
+        run: |
+          scp -r docker-compose.yml infrastructure/ ${{ secrets.SSH_USER }}@${{ secrets.VPS_IP }}:/srv/domfeliu/
+
+      - name: Deploy via SSH
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.VPS_IP }} "
+            cd /srv/domfeliu &&
+            echo '${{ secrets.GH_PAT }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin &&
+            docker compose pull &&
+            docker compose up -d
+          "
+
+      - name: Run Database Migrations
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.VPS_IP }} "
+            docker exec domfeliu_api npx prisma migrate deploy
+          "

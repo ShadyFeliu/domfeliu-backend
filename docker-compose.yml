@@ -1,0 +1,45 @@
+services:
+  domfeliu_db:
+    image: postgres:16-alpine
+    container_name: domfeliu_db
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - domfeliu_db_data:/var/lib/postgresql/data
+    networks:
+      - domfeliu_network
+
+  domfeliu_api:
+    image: ghcr.io/shadyfeliu/domfeliu-backend:master
+    container_name: domfeliu_api
+    restart: always
+    depends_on:
+      - domfeliu_db
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@domfeliu_db:5432/${DB_NAME}?schema=public
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=3001
+      - CORS_ORIGIN=${CORS_ORIGIN}
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - domfeliu_network
+
+  domfeliu_web:
+    image: ghcr.io/shadyfeliu/domfeliu-frontend:master
+    container_name: domfeliu_web
+    restart: always
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    networks:
+      - domfeliu_network
+
+networks:
+  domfeliu_network:
+    driver: bridge
+
+volumes:
+  domfeliu_db_data:
