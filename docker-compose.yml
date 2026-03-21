@@ -23,6 +23,8 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - PORT=3001
       - CORS_ORIGIN=${CORS_ORIGIN}
+    ports:
+      - "3001:3001"
     volumes:
       - ./uploads:/app/uploads
     networks:
@@ -34,6 +36,8 @@ services:
     restart: always
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    ports:
+      - "3000:3000"
     networks:
       - domfeliu_network
 
