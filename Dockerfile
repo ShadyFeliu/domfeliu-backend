@@ -25,6 +25,7 @@ WORKDIR /app
 # Install only production dependencies
 COPY package*.json ./
 COPY prisma ./prisma/
+COPY prisma.config.ts ./
 RUN npm install --omit=dev
 
 # Copy build artifacts and prisma client from builder
