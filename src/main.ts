@@ -40,7 +40,6 @@ async function bootstrap(): Promise<void> {
   );
 
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.setGlobalPrefix('api');
 
   await app.listen(port);
   console.log(
